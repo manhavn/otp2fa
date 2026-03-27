@@ -7,20 +7,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/joho/godotenv"
+	"root/lib/otp2fa"
+
 	"github.com/mattn/go-tty"
 	"github.com/variar/buckets"
 )
-
-func init() {
-	func() {
-		envLookup, found := os.LookupEnv("TOTP_APP_ENV_PATH_GLOBAL")
-		if !found {
-			envLookup = "env/global.env"
-		}
-		_ = godotenv.Load(envLookup)
-	}()
-}
 
 func main() {
 	var database string
@@ -46,13 +37,13 @@ func main() {
 		}
 	}()
 	if len(database) == 0 {
-		database = os.Getenv("TOTP_APP_DATABASE_FILENAME")
+		database = otp2fa.TOTP_APP_DATABASE_FILENAME
 	}
 	if len(database) == 0 {
 		fmt.Printf("\r\033[KUsage: --database=\"totp.db\"\n")
 		return
 	}
-	databasePath := os.Getenv("TOTP_APP_DATABASE_FOLDER") + database
+	databasePath := otp2fa.TOTP_APP_DATABASE_FOLDER + database
 
 	// Open a buckets database.
 	bx, err := buckets.Open(databasePath)
@@ -91,7 +82,7 @@ func main() {
 
 	listAccountData := map[string]string{}
 	func() {
-		rate, _ := strconv.Atoi(os.Getenv("TOTP_APP_RATE_COUNT"))
+		rate, _ := strconv.Atoi(otp2fa.TOTP_APP_RATE_COUNT)
 		if rate < 1 || rate > 100 {
 			rate = 10
 		}

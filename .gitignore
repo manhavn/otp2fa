@@ -16,6 +16,7 @@
 !totpupdateaccount.go
 !build-docker.sh
 !restart.sh
+!podman-build.sh
 
 !lib
 !env

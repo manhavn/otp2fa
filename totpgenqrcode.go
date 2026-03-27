@@ -8,22 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/joho/godotenv"
 	"github.com/mattn/go-tty"
 	"github.com/variar/buckets"
 
 	"root/lib/otp2fa"
 )
-
-func init() {
-	func() {
-		envLookup, found := os.LookupEnv("TOTP_APP_ENV_PATH_GLOBAL")
-		if !found {
-			envLookup = "env/global.env"
-		}
-		_ = godotenv.Load(envLookup)
-	}()
-}
 
 func main() {
 	var database, output string
@@ -54,7 +43,7 @@ func main() {
 		}
 	}()
 	if len(output) == 0 {
-		output = strings.TrimSuffix(os.Getenv("TOTP_APP_QRCODE_FOLDER"), "/")
+		output = strings.TrimSuffix(otp2fa.TOTP_APP_QRCODE_FOLDER, "/")
 		fmt.Printf(
 			"\r\003[K(default --output=\"%s\")\n\r\003[KUsage: --database=\"totp.db\" --output=\"new-qrcode\"\n",
 			output,
@@ -62,7 +51,7 @@ func main() {
 	}
 	_ = os.MkdirAll(output, 0o755)
 	if len(database) == 0 {
-		database = os.Getenv("TOTP_APP_DATABASE_FILENAME")
+		database = otp2fa.TOTP_APP_DATABASE_FILENAME
 	}
 	if len(database) == 0 {
 		fmt.Printf(
@@ -71,7 +60,11 @@ func main() {
 		)
 		return
 	}
-	databasePath := os.Getenv("TOTP_APP_DATABASE_FOLDER") + database
+	databasePath := otp2fa.TOTP_APP_DATABASE_FOLDER + database
+	regexWordFilename := otp2fa.TOTP_APP_REGEX_WORD_FILENAME
+	if regexWordFilename == "" {
+		regexWordFilename = `[\p{L}\p{M}\p{N}]+`
+	}
 
 	// Open a buckets database.
 	bx, err := buckets.Open(databasePath)
@@ -102,7 +95,7 @@ func main() {
 
 	listAccountData := map[string]string{}
 	func() {
-		rate, _ := strconv.Atoi(os.Getenv("TOTP_APP_RATE_COUNT"))
+		rate, _ := strconv.Atoi(otp2fa.TOTP_APP_RATE_COUNT)
 		if rate < 1 || rate > 100 {
 			rate = 10
 		}
@@ -231,7 +224,7 @@ func main() {
 						)
 
 						allTextData := fmt.Sprintf("%s-%s-%s", issuer, accountTitle, accountName)
-						allString := regexp.MustCompile(`[\p{L}\p{N}]+`).
+						allString := regexp.MustCompile(regexWordFilename).
 							FindAllString(allTextData, -1)
 						filename := strings.Join(allString, "-")
 						folderPath := output

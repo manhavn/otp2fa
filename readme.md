@@ -11,8 +11,8 @@ TOTP_APP_RATE_COUNT=10
 TOTP_APP_DATABASE_FILENAME=totp.db
 TOTP_APP_QRCODE_FOLDER=qrcode/
 TOTP_APP_DATABASE_FOLDER=database/
-TOTP_APP_REGEX_WORD_FILENAME=[\p{L}\p{N}]+
-TOTP_APP_DENIM_WORD_FILENAME=-
+TOTP_APP_REGEX_WORD_FILENAME=[\p{L}\p{M}\p{N}]+
+TOTP_APP_DELIM_WORD_FILENAME=-
 ```
 
 ## APP Shell Script
@@ -74,12 +74,12 @@ TOTP_APP_RATE_COUNT=10
 TOTP_APP_DATABASE_FILENAME=totp.db
 TOTP_APP_QRCODE_FOLDER=qrcode/
 TOTP_APP_DATABASE_FOLDER=database/
-TOTP_APP_REGEX_WORD_FILENAME=[\p{L}\p{N}]+
-TOTP_APP_DENIM_WORD_FILENAME=-
+TOTP_APP_REGEX_WORD_FILENAME=[\p{L}\p{M}\p{N}]+
+TOTP_APP_DELIM_WORD_FILENAME=-
 ' > env/global.env
 
  # RUN container
- docker run -d --name otp2fa -v ${PWD}/env:/app/env -v ${PWD}/database:/app/database -v ${PWD}/qrcode:/app/qrcode -v ${PWD}/new-qrcode:/app/new-qrcode -it manhavn/otp2fa:v0.0.1
+ docker run -d --name otp2fa -v ${PWD}/otp2fa/env:/app/env -v ${PWD}/otp2fa/database:/app/database -v ${PWD}/otp2fa/qrcode:/app/qrcode -v ${PWD}/otp2fa/new-qrcode:/app/new-qrcode -it manhavn/otp2fa:v0.0.1
  docker exec otp2fa create --issuer="test.com" --account="hello@account.com" --title="Test Title"
  docker exec otp2fa load --database="totp.db" --qrcode="test-com-Test-Title-hello-account-com.png"
  docker exec -it otp2fa update --database="totp.db"

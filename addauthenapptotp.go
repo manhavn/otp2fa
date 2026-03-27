@@ -9,21 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/variar/buckets"
 
 	"root/lib/otp2fa"
 )
-
-func init() {
-	func() {
-		envLookup, found := os.LookupEnv("TOTP_APP_ENV_PATH_GLOBAL")
-		if !found {
-			envLookup = "env/global.env"
-		}
-		_ = godotenv.Load(envLookup)
-	}()
-}
 
 func main() {
 	var database, qrcode string
@@ -60,7 +49,7 @@ func main() {
 		return
 	}
 	if len(database) == 0 {
-		database = os.Getenv("TOTP_APP_DATABASE_FILENAME")
+		database = otp2fa.TOTP_APP_DATABASE_FILENAME
 	}
 	if len(database) == 0 {
 		fmt.Println(
@@ -68,8 +57,8 @@ func main() {
 		)
 		return
 	}
-	databasePath := os.Getenv("TOTP_APP_DATABASE_FOLDER") + database
-	qrcodePath := os.Getenv("TOTP_APP_QRCODE_FOLDER") + qrcode
+	databasePath := otp2fa.TOTP_APP_DATABASE_FOLDER + database
+	qrcodePath := otp2fa.TOTP_APP_QRCODE_FOLDER + qrcode
 	data, err := os.ReadFile(qrcodePath)
 	if err != nil {
 		fmt.Println(err)

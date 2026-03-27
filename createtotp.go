@@ -6,19 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/joho/godotenv"
 	"root/lib/otp2fa"
 )
-
-func init() {
-	func() {
-		envLookup, found := os.LookupEnv("TOTP_APP_ENV_PATH_GLOBAL")
-		if !found {
-			envLookup = "env/global.env"
-		}
-		_ = godotenv.Load(envLookup)
-	}()
-}
 
 func main() {
 	var issuer, account, title string
@@ -70,18 +59,18 @@ func main() {
 		return
 	}
 
-	folderPath := os.Getenv("TOTP_APP_QRCODE_FOLDER")
-	regexWordFilename := os.Getenv("TOTP_APP_REGEX_WORD_FILENAME")
-	denimWordFilename := os.Getenv("TOTP_APP_DENIM_WORD_FILENAME")
+	folderPath := otp2fa.TOTP_APP_QRCODE_FOLDER
+	regexWordFilename := otp2fa.TOTP_APP_REGEX_WORD_FILENAME
 	if regexWordFilename == "" {
-		regexWordFilename = `[\p{L}\p{N}]+`
+		regexWordFilename = `[\p{L}\p{M}\p{N}]+`
 	}
-	if denimWordFilename == "" {
-		denimWordFilename = "-"
+	DELIMWordFilename := otp2fa.TOTP_APP_DELIM_WORD_FILENAME
+	if DELIMWordFilename == "" {
+		DELIMWordFilename = "-"
 	}
 	allTextData := fmt.Sprintf("%s-%s-%s", issuer, title, account)
 	allString := regexp.MustCompile(regexWordFilename).FindAllString(allTextData, -1)
-	filename := strings.Join(allString, denimWordFilename)
+	filename := strings.Join(allString, DELIMWordFilename)
 	_ = os.MkdirAll(folderPath, 0o755)
 
 	func() {
